@@ -533,7 +533,7 @@ public class Main {
             System.out.println(String.format("Output file \"%s\" already exists!", OutputFileSpec));
             System.exit(4);
         }
-        if (OutputFileSpec.endsWith(".MD3")) {
+        if (OutputFileSpec.toUpperCase().endsWith(".MD3")) {
             if (!SaveToBinary(MD3Model, OutputFileSpec)) {
                 System.out.println(String.format("An error has occured writing model \"%s\"!", OutputFileSpec));
                 System.exit(5);
