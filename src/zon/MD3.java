@@ -125,8 +125,8 @@ public class MD3 {
             }
             // Read the tags.
             Source.seek(OffsetOfTags);
-            for (int TagIndex = 0; TagIndex < MD3Model.NumberOfTags; TagIndex++) {
-                for (int FrameIndex = 0; FrameIndex < MD3Model.NumberOfFrames; FrameIndex++) {
+            for (int FrameIndex = 0; FrameIndex < MD3Model.NumberOfFrames; FrameIndex++) {
+                for (int TagIndex = 0; TagIndex < MD3Model.NumberOfTags; TagIndex++) {
                     String Name = ReadString(Source, 64);
                     float X = ReadFloat32(Source);
                     float Y = ReadFloat32(Source);
@@ -438,9 +438,9 @@ public class MD3 {
                 WriteString(Writer, MD3ModelFrame.Name, 16);
             }
             // Write the tags.
-            for (int TagIndex = 0; TagIndex < MD3Model.NumberOfTags; TagIndex++) {
-                for (int FrameIndex = 0; FrameIndex < MD3Model.NumberOfFrames; FrameIndex++) {
-                    TMD3TagFrame MD3Tag = MD3Model.TagFrames.get(TagIndex * MD3Model.NumberOfFrames + FrameIndex);
+            for (int FrameIndex = 0; FrameIndex < MD3Model.NumberOfFrames; FrameIndex++) {
+                for (int TagIndex = 0; TagIndex < MD3Model.NumberOfTags; TagIndex++) {
+                    TMD3TagFrame MD3Tag = MD3Model.TagFrames.get(FrameIndex * MD3Model.NumberOfTags + TagIndex);
                     WriteString(Writer, MD3Tag.Name, 64);
                     WriteFloat32(Writer, MD3Tag.Location.X);
                     WriteFloat32(Writer, MD3Tag.Location.Y);
@@ -525,12 +525,13 @@ public class MD3 {
         }
         SB.append("\n\n# Tags");
         for (int I = 0; I < MD3Model.NumberOfTags; I++) {
-            SB.append(String.format("\n\n# %d.Tag", I + 1));
             TMD3Tag MD3Tag = MD3Model.Tags.get(I);
             SB.append(String.format("\ntag %s", MD3Tag.Name));
-            for (int J = 0; J < MD3Model.NumberOfFrames; J++) {
-                TMD3TagFrame MD3FrameTag = MD3Model.TagFrames.get(I * MD3Model.NumberOfFrames + J);
-                SB.append(String.format("\n\n# %d.Frame", J + 1));
+        }
+        for (int I = 0; I < MD3Model.NumberOfFrames; I++) {
+            for (int J = 0; J < MD3Model.NumberOfTags; J++) {
+                TMD3TagFrame MD3FrameTag = MD3Model.TagFrames.get(I * MD3Model.NumberOfTags + J);
+                SB.append(String.format("\n\n# %d.Frame, %d.Tag %s", I + 1, J + 1, MD3FrameTag.Name));
                 SB.append(String.format("\ntp %s %s %s", DF.format(MD3FrameTag.Location.X), DF.format(MD3FrameTag.Location.Y), DF.format(MD3FrameTag.Location.Z)));
                 SB.append(String.format("\ntr %s %s %s %s %s %s %s %s %s",
                         DF.format(MD3FrameTag.OrientationX.X), DF.format(MD3FrameTag.OrientationX.Y), DF.format(MD3FrameTag.OrientationX.Z),
