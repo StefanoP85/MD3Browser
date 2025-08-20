@@ -221,8 +221,6 @@ public class MD3 {
         TMD3Surface MD3Surface = null;
         TMD3Tag MD3Tag = null;
         TMD3TagFrame MD3TagFrame = null;
-        boolean TagPositionRead = false;
-        boolean TagRotationRead = false;
         MD3Model.HeaderID = "IDP3";
         MD3Model.HeaderVersion = 15;
         MD3Model.HeaderName = "";
@@ -258,54 +256,31 @@ public class MD3 {
                         if (InputTokens.length > 1)
                             Name = InputTokens[1];
                         MD3Tag = new TMD3Tag(Name);
-                        TagPositionRead = false;
-                        TagRotationRead = false;
                         MD3Model.Tags.add(MD3Tag);
                         MD3Model.NumberOfTags++;
                     }
-                    if (InputTokens[0].equalsIgnoreCase("tp")) {
-                        TagPositionRead = true;
-                        if (!TagRotationRead) {
-                            MD3TagFrame = new TMD3TagFrame(MD3Tag.Name,
-                                    new TCoordinate(0, 0, 0),
-                                    new TCoordinate(0, 0, 0),
-                                    new TCoordinate(0, 0, 0),
-                                    new TCoordinate(0, 0, 0)
-                            );
-                        }
+                    if (InputTokens[0].equalsIgnoreCase("tf")) {
+                        int CurrentPosition = MD3Model.TagFrames.size();
+                        String Name = MD3Model.Tags.get(CurrentPosition % MD3Model.Tags.size()).Name;
+                        MD3TagFrame = new TMD3TagFrame(Name,
+                                new TCoordinate(0, 0, 0),
+                                new TCoordinate(0, 0, 0),
+                                new TCoordinate(0, 0, 0),
+                                new TCoordinate(0, 0, 0)
+                        );
                         MD3TagFrame.Location.X = Float.parseFloat(InputTokens[1]);
                         MD3TagFrame.Location.Y = Float.parseFloat(InputTokens[2]);
                         MD3TagFrame.Location.Z = Float.parseFloat(InputTokens[3]);
-                        if (TagRotationRead) {
-                            MD3Model.TagFrames.add(MD3TagFrame);
-                            TagPositionRead = false;
-                            TagRotationRead = false;
-                        }
-                    }
-                    if (InputTokens[0].equalsIgnoreCase("tr")) {
-                        TagRotationRead = true;
-                        if (!TagPositionRead) {
-                            MD3TagFrame = new TMD3TagFrame(MD3Tag.Name,
-                                    new TCoordinate(0, 0, 0),
-                                    new TCoordinate(0, 0, 0),
-                                    new TCoordinate(0, 0, 0),
-                                    new TCoordinate(0, 0, 0)
-                            );
-                        }
-                        MD3TagFrame.OrientationX.X = Float.parseFloat(InputTokens[1]);
-                        MD3TagFrame.OrientationX.Y = Float.parseFloat(InputTokens[2]);
-                        MD3TagFrame.OrientationX.Z = Float.parseFloat(InputTokens[3]);
-                        MD3TagFrame.OrientationY.X = Float.parseFloat(InputTokens[4]);
-                        MD3TagFrame.OrientationY.Y = Float.parseFloat(InputTokens[5]);
-                        MD3TagFrame.OrientationY.Z = Float.parseFloat(InputTokens[6]);
-                        MD3TagFrame.OrientationZ.X = Float.parseFloat(InputTokens[7]);
-                        MD3TagFrame.OrientationZ.Y = Float.parseFloat(InputTokens[8]);
-                        MD3TagFrame.OrientationZ.Z = Float.parseFloat(InputTokens[9]);
-                        if (TagPositionRead) {
-                            MD3Model.TagFrames.add(MD3TagFrame);
-                            TagPositionRead = false;
-                            TagRotationRead = false;
-                        }
+                        MD3TagFrame.OrientationX.X = Float.parseFloat(InputTokens[4]);
+                        MD3TagFrame.OrientationX.Y = Float.parseFloat(InputTokens[5]);
+                        MD3TagFrame.OrientationX.Z = Float.parseFloat(InputTokens[6]);
+                        MD3TagFrame.OrientationY.X = Float.parseFloat(InputTokens[7]);
+                        MD3TagFrame.OrientationY.Y = Float.parseFloat(InputTokens[8]);
+                        MD3TagFrame.OrientationY.Z = Float.parseFloat(InputTokens[9]);
+                        MD3TagFrame.OrientationZ.X = Float.parseFloat(InputTokens[10]);
+                        MD3TagFrame.OrientationZ.Y = Float.parseFloat(InputTokens[11]);
+                        MD3TagFrame.OrientationZ.Z = Float.parseFloat(InputTokens[12]);
+                        MD3Model.TagFrames.add(MD3TagFrame);
                     }
                     if (InputTokens[0].equalsIgnoreCase("mesh")) {
                         String Name = "";
@@ -532,8 +507,8 @@ public class MD3 {
             for (int J = 0; J < MD3Model.NumberOfTags; J++) {
                 TMD3TagFrame MD3FrameTag = MD3Model.TagFrames.get(I * MD3Model.NumberOfTags + J);
                 SB.append(String.format("\n\n# %d.Frame, %d.Tag %s", I + 1, J + 1, MD3FrameTag.Name));
-                SB.append(String.format("\ntp %s %s %s", DF.format(MD3FrameTag.Location.X), DF.format(MD3FrameTag.Location.Y), DF.format(MD3FrameTag.Location.Z)));
-                SB.append(String.format("\ntr %s %s %s %s %s %s %s %s %s",
+                SB.append(String.format("\ntf %s %s %s %s %s %s %s %s %s %s %s %s",
+                        DF.format(MD3FrameTag.Location.X), DF.format(MD3FrameTag.Location.Y), DF.format(MD3FrameTag.Location.Z),
                         DF.format(MD3FrameTag.OrientationX.X), DF.format(MD3FrameTag.OrientationX.Y), DF.format(MD3FrameTag.OrientationX.Z),
                         DF.format(MD3FrameTag.OrientationY.X), DF.format(MD3FrameTag.OrientationY.Y), DF.format(MD3FrameTag.OrientationY.Z),
                         DF.format(MD3FrameTag.OrientationZ.X), DF.format(MD3FrameTag.OrientationZ.Y), DF.format(MD3FrameTag.OrientationZ.Z)));
